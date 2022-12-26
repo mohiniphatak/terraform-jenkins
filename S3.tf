@@ -1,5 +1,9 @@
 resource "aws_s3_bucket" "s3-sink" {
- bucket = "response-data-654542323"
+ bucket = "bucket-created-jenkins-terraform"
+ versioning {
+    enabled = var.versioning
+  }
+  
 
 }
 
