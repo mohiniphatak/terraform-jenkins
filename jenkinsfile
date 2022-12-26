@@ -1,82 +1,29 @@
-/**
- * Pipeline to build and upload docker images from behaviosense to ECR of CPF, files found in behaviosense download page
- * https://developer.behaviosec.com/dw/download_behaviosense#docker_with_behaviosense_downloads
- **/
-
-BUILDER_IMG = 'ccoe-builder:latest'
-
-pullFromEcr(BUILDER_IMG, 'force')
-
 pipeline {
-
-    environment {
-        AWS_REGION = 'eu-west-1'
-        CCOE_DOCKER_REGISTRY = '364737385840.dkr.ecr.eu-west-1.amazonaws.com'
-        REPOSITORY_NAME = 'efraud-behavio-backend'
-        REPOSITORY_NAME_SNAPSHOTS = 'efraud-behavio-backend-snapshots'
-
-    }
-
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '20'))
-    } // options
-
-    agent {
-        docker {
-            label 'docker-builder'
-            image "$BUILDER_IMG"
-            args '-v /var/run/docker.sock:/var/run/docker.sock --group-add=docker'
-        } // docker
-    } // agent
+    agent any
 
     stages {
-          stage('Build and upload docker api image') {
-              environment {
-                  SERVICE_NAME_API = 'behaviosense-api'
-                  SERVICE_VERSION_API = '5.5.1'
-                  BEHAVIOSENSE_EAR_API_PATH ='deployments/behaviosenseapplication-api-5.5.1-jboss_mysql.ear'
-                  SERVICE_NAME_DASHBOARD = 'behaviosense-dashboard'
-                  SERVICE_VERSION_DASHBOARD = '5.5.1'
-                  BEHAVIOSENSE_EAR_DASHBOARD_PATH ='deployments/behaviosenseapplication-dashboard-5.5.1-jboss_mysql.ear'
-                  SERVICE_VERSION_BACKEND = '5.5.1'
-                  //BEHAVIOSENSE_EAR_BACKEND_PATH ='deployments/behaviosenseapplication-dashboard-5.5.1-jboss_mysql.ear'
-              }
-              steps {
-
-                  script {
-                      if (env.BRANCH_NAME == 'master') {
-                          SERVICE_DOCKER_IMAGE_API = "$CCOE_DOCKER_REGISTRY/${REPOSITORY_NAME}:${SERVICE_NAME_API}_v${SERVICE_VERSION_API}"
-                          SERVICE_DOCKER_IMAGE_DASHBOARD = "$CCOE_DOCKER_REGISTRY/${REPOSITORY_NAME}:${SERVICE_NAME_DASHBOARD}_v${SERVICE_VERSION_DASHBOARD}"
-                          SERVICE_DOCKER_IMAGE_DASHBOARD = "$CCOE_DOCKER_REGISTRY/${REPOSITORY_NAME}:${SERVICE_NAME_DASHBOARD}_v${SERVICE_VERSION_DASHBOARD}"
-
-                      } else {
-                          SERVICE_DOCKER_IMAGE_API = "$CCOE_DOCKER_REGISTRY/${REPOSITORY_NAME_SNAPSHOTS}:${SERVICE_NAME_API}_v${SERVICE_VERSION_API}"
-                          SERVICE_DOCKER_IMAGE_DASHBOARD = "$CCOE_DOCKER_REGISTRY/${REPOSITORY_NAME_SNAPSHOTS}:${SERVICE_NAME_DASHBOARD}_v${SERVICE_VERSION_DASHBOARD}"
-                      }
-                      withAWS(region: AWS_REGION) {
-                          def login = ecrLogin()
-                          sh script: login, label: "Log into ECR"
-                      }
-                      //docker build  --build-arg BEHAVIOSENSE_EAR=deployments/behaviosenseapplication_v5.0.x_jboss_mysql_api.ear
-                      sh script: "docker build backend-infra/images -t $SERVICE_DOCKER_IMAGE_API --build-arg BEHAVIOSENSE_EAR=$BEHAVIOSENSE_EAR_API_PATH", label: "Build docker image"
-                      sh script: "docker build backend-infra/images -t $SERVICE_DOCKER_IMAGE_DASHBOARD --build-arg BEHAVIOSENSE_EAR=$BEHAVIOSENSE_EAR_DASHBOARD_PATH", label: "Build docker image"
-                      sh script: "docker build backend-infra/images -t $SERVICE_DOCKER_IMAGE_DASHBOARD --build-arg BEHAVIOSENSE_EAR=$BEHAVIOSENSE_EAR_DASHBOARD_PATH", label: "Build docker image"
-                      sh script: "docker push $SERVICE_DOCKER_IMAGE_API", label: "Push docker image"
-                      sh script: "docker push $SERVICE_DOCKER_IMAGE_DASHBOARD", label: "Push docker image"
-
-                  }
-              }
-          }
-
-    } // stages
-
-    post { always { cleanWs() } }
-} // pipeline
-
-
-        <property name="com.behaviosec.api.use_automodel" value="true"/>
-        <property name="com.behaviosec.api.automodel_window" value="1-5"/>
-
-COPY --chown=${WILDFLY_USER}:${WILDFLY_USER} \
-    ext/standalone/backend/standalone-behaviosense.xml \
-    ${JBOSS_HOME}/standalone/configuration/standalone-behaviosense.xml
+        stage('Checkout') {
+            steps {
+            checkout scm
+            }
+        }
+        
+        stage ("terraform init") {
+            steps {
+                sh ('terraform init -reconfigure') 
+            }
+        }
+        stage ("terraform plan") {
+            steps {
+                sh ('terraform plan') 
+            }
+        }
+                
+        stage ("terraform Action") {
+            steps {
+                echo "Terraform action is --> ${action}"
+                sh ('terraform ${action} --auto-approve') 
+           }
+        }
+    }
+}
