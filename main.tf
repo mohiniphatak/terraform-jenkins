@@ -22,10 +22,6 @@ provider "aws" {
 
 
 
-resource "aws_s3_bucket" "s3-sink" {
- bucket = "response-data-654542323"
-
-}
 
 # resource "aws_s3_bucket_notification" "bucket_notification" {
 #   bucket = aws_s3_bucket.s3-sink.id
