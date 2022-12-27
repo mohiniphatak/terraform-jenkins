@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     stages {
         stage('Hello') {
             steps {
@@ -10,16 +9,13 @@ pipeline {
         
         stage('Terraform Plan') {
             steps {
-                script{
-                    
-                        
-                                sh "terraform init"
-                                PLANSTATUS = sh(returnStatus: true, script: "terraform plan -detailed-exitcode -lock=true -out jenkins-backend.tfplan")
-                                if (PLANSTATUS == 1) {
-                                    currentBuild.result = 'ABORTED'
-                                    error("Terraform Plan failed, check output.")
-                                }
-                    
+                script{             
+                        sh "terraform init"
+                        PLANSTATUS = sh(returnStatus: true, script: "terraform plan -detailed-exitcode -lock=true -out jenkins-backend.tfplan")
+                        if (PLANSTATUS == 1) {
+                            currentBuild.result = 'ABORTED'
+                            error("Terraform Plan failed, check output.")
+                        }                    
                 } // script
             } // steps
         } // stage
@@ -49,16 +45,14 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    
+                script {                  
                         
-                                sh "terraform apply -lock=true -input=false jenkins-backend.tfplan"
-                            }
-                      
+                    sh "terraform apply -lock=true -input=false jenkins-backend.tfplan"
+                }                     
 
             } // steps
         
-    } // stages
+        } // stage
         
-    }
+    } //stages
 }
