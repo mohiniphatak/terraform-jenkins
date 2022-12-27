@@ -2,24 +2,24 @@
 #   name = "${lower(var.env)}-${lower(var.project_name)}-deadletter-queue-again"
 # }
 
-resource "aws_sqs_queue" "terraform_queue" {
-  name = "${lower(var.env)}-${lower(var.project_name)}-sqs-queue-for-splunk-again"
-  # kms_master_key_id = "" 
-  # sqs_managed_sse_enabled = false
-  delay_seconds             = 0
-  max_message_size          = 262144
-  message_retention_seconds = 345600
-  visibility_timeout_seconds = 300  
-  receive_wait_time_seconds = 0
-  # redrive_policy = jsonencode({
-  #   deadLetterTargetArn = aws_sqs_queue.terraform_queue_deadletter.arn
-  #   maxReceiveCount     = 10
-  # })
+# resource "aws_sqs_queue" "terraform_queue" {
+#   name = "${lower(var.env)}-${lower(var.project_name)}-sqs-queue-for-splunk-again"
+#   # kms_master_key_id = "" 
+#   # sqs_managed_sse_enabled = false
+#   delay_seconds             = 0
+#   max_message_size          = 262144
+#   message_retention_seconds = 345600
+#   visibility_timeout_seconds = 300  
+#   receive_wait_time_seconds = 0
+#   # redrive_policy = jsonencode({
+#   #   deadLetterTargetArn = aws_sqs_queue.terraform_queue_deadletter.arn
+#   #   maxReceiveCount     = 10
+#   # })
 
-  tags = {
-    Environment = "${lower(var.env)}"
-  }
-}
+#   tags = {
+#     Environment = "${lower(var.env)}"
+#   }
+# }
 
 
 # resource "aws_sqs_queue_policy" "my_sqs_policy" {
