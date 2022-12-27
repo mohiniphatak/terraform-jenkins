@@ -10,12 +10,25 @@
 
 
 
-# Provider Block
-provider "aws" {
-  profile = "default" # AWS Credentials Profile configured on your local desktop terminal  $HOME/.aws/credentials
-  region  = "ap-south-1"
+# # Provider Block
+# provider "aws" {
+#   profile = "default" # AWS Credentials Profile configured on your local desktop terminal  $HOME/.aws/credentials
+#   region  = "ap-south-1"
+# }
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
 }
 
+# Configure the AWS Provider
+provider "aws" {
+  region = "ap-south-1"
+}
 
 # # Resource Block
 # resource "aws_instance" "ec2demotest" {
