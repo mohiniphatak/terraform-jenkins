@@ -6,6 +6,7 @@
 
 variable "env" {
   type = string
+  default	= "Test"
 }
 
 
