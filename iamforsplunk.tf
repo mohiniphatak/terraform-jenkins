@@ -20,20 +20,20 @@
 #   }
 # }
 
-# resource "aws_iam_policy" "policy" {
-#   name        = "test-policy-through-terraform"
-#   description = "A test policy"
-#   policy      = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#         {
-#             Effect = "Allow"
-#             Action = "s3:*"
-#             Resource = "*"
-#         }
-#     ]
-#   })
-# }
+resource "aws_iam_policy" "policy" {
+  name        = "test-policy-through-terraform-jenkins"
+  description = "A test policy"
+  policy      = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+        {
+            Effect = "Allow"
+            Action = "s3:*"
+            Resource = "*"
+        }
+    ]
+  })
+}
 
 # resource "aws_iam_policy_attachment" "test-attach" {
 #   name       = "test-attachment-through-terraform"
