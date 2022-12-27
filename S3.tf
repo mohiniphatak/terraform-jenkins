@@ -1,9 +1,5 @@
 resource "aws_s3_bucket" "s3-sink" {
  bucket = "bucket-created-jenkins-terraform"
-
-
-  
-
 }
 
 # resource "aws_s3_bucket_notification" "bucket_notification" {
