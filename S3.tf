@@ -8,14 +8,14 @@ resource "aws_s3_bucket" "s3-sink" {
 
 }
 
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = aws_s3_bucket.s3-sink.id
+# resource "aws_s3_bucket_notification" "bucket_notification" {
+#   bucket = aws_s3_bucket.s3-sink.id
 
-  queue {
-    queue_arn     = aws_sqs_queue.terraform_queue.arn
-    events        = ["s3:ObjectCreated:*"]
-  }
-}
+#   queue {
+#     queue_arn     = aws_sqs_queue.terraform_queue.arn
+#     events        = ["s3:ObjectCreated:*"]
+#   }
+# }
 
 
 
