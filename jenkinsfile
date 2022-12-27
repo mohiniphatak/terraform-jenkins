@@ -18,6 +18,21 @@ pipeline {
                 sh ('terraform plan') 
             }
         }
+
+        stage('Terraform Plan') {
+            steps {
+                script{
+                    
+                        PLANSTATUS = sh(returnStatus: true, script: "terraform plan -detailed-exitcode -lock=true -out")
+                        if (PLANSTATUS == 1) {
+                        currentBuild.result = 'ABORTED'
+                        error("Terraform Plan failed, check output.")
+                            
+                    }
+                } // script
+            } // steps
+        } /
+
                 
         stage ("terraform Action") {
             steps {
@@ -27,3 +42,4 @@ pipeline {
         }
     }
 }
+
