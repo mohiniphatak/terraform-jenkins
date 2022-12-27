@@ -13,33 +13,16 @@ pipeline {
                 sh ('terraform init -reconfigure') 
             }
         }
-        // stage ("terraform plan") {
-        //     steps {
-        //         sh ('terraform plan') 
-        //     }
-        // }
-
-        stage('Approve Plan') {
+        stage ("terraform plan") {
             steps {
-                script {
-                    USERINPUT = input(id: 'ConfirmPlan',
-                        message: 'Apply Terraform Plan?',
-                        parameters: [ [
-                            $class: 'BooleanParameterDefinition',
-                            defaultValue: false,
-                            description: 'Apply Terraform Plan',
-                            name: 'confirm'
-                        ] ]
-                    )
-                } // script
-            } // steps
-        } // stage
-
+                sh ('terraform plan') 
+            }
+        }
                 
         stage ("terraform Action") {
             steps {
-                // echo "Terraform action is --> ${action}"
-                sh ('terraform apply') 
+                echo "Terraform action is --> ${action}"
+                sh ('terraform ${action} --auto-approve') 
            }
         }
     }
