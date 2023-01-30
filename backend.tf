@@ -15,7 +15,7 @@ provider "aws" {
 terraform {
   backend "s3" {
     bucket = "terraform-jenkins-state-bucket-mahi123"
-    key = "main"
+    key = "main1"
     region = "ap-south-1"
     dynamodb_table = "my-dynamo-db-table1"
   }
