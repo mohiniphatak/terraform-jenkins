@@ -1,29 +1,54 @@
 pipeline {
     agent any
-
     stages {
-        stage('Checkout') {
-            steps {
-            checkout scm
-            }
-        }
+        // stage('Hello') {
+        //     steps {
+        //         checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/mohiniphatak/terraform-jenkins']]])
+        //     }
+        // }     
         
-        stage ("terraform init") {
+        stage('Terraform Plan') {
             steps {
-                sh ('terraform init -reconfigure') 
-            }
-        }
-        stage ("terraform plan") {
-            steps {
-                sh ('terraform plan') 
-            }
-        }               
-        stage ("terraform Action") {
-            steps {
-                echo "Terraform action is --> ${action}"
-                sh ('terraform ${action} --auto-approve') 
-           }
-        }
-    }
-}
+                script{             
+                        sh "terraform init"
+                        PLANSTATUS = sh(returnStatus: true, script: "terraform plan -detailed-exitcode -lock=true -out jenkins-backend.tfplan")
+                        if (PLANSTATUS == 1) {
+                            currentBuild.result = 'ABORTED'
+                            error("Terraform Plan failed, check output.")
+                        }                    
+                } // script
+            } // steps
+        } // stage
 
+        stage('Approve Plan') {
+            when { expression { (PLANSTATUS == 2) }}
+            steps {
+                script {
+                    USERINPUT = input(id: 'ConfirmPlan',
+                        message: 'Apply Terraform Plan?',
+                        parameters: [ [
+                            $class: 'BooleanParameterDefinition',
+                            defaultValue: false,
+                            description: 'Apply Terraform Plan',
+                            name: 'confirm'
+                        ] ]
+                    )
+                } // script
+            } // steps
+        } // stage
+
+        stage('Terraform Apply') {
+            when {
+                allOf {
+                    expression { (PLANSTATUS == 2) }
+                    expression { (USERINPUT == true) }
+                }
+            }
+            steps {
+                script {                  
+                    sh "terraform apply -lock=true -input=false jenkins-backend.tfplan"
+                }
+            } // steps
+        } // stage
+    } //stages
+}
