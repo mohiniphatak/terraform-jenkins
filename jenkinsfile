@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script{             
                         sh "terraform init"
-                        PLANSTATUS = sh(returnStatus: true, script: "terraform plan -detailed-exitcode -lock=true -out jenkins-backend.tfplan")
+                        PLANSTATUS = sh(returnStatus: true, script: "terraform plan -detailed-exitcode -lock=false -out jenkins-backend.tfplan")
                         if (PLANSTATUS == 1) {
                             currentBuild.result = 'ABORTED'
                             error("Terraform Plan failed, check output.")
