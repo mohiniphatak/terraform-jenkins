@@ -9,29 +9,6 @@ pipeline {
     }
    
     stages {
-
-        // stages {
-        //     //     stage('Build and upload docker api image') {
-                    
-        //     //         steps {
-
-        //     //             script {
-                            
-        //     //                 withAWS(region: AWS_REGION) {
-        //     //                     def login = ecrLogin()
-        //     //                     sh script: login, label: "Log into ECR"
-        //     //                 }
-        //     //                 //docker build  --build-arg BEHAVIOSENSE_EAR=deployments/behaviosenseapplication_v5.0.x_jboss_mysql_api.ear
-        //     //                 sh script: "docker build deploy-images -t .", label: "Build docker image"
-                            
-        //     //                 sh script: "docker push $SERVICE_DOCKER_IMAGE_BACKEND", label: "Push docker image"
-
-        //     //             }
-        //     //         }
-        //     //     }
-
-        //     // } // stages
-
         
          stage('Logging into AWS ECR') {
             steps {
@@ -44,7 +21,7 @@ pipeline {
         
         stage('Cloning Git') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/mohiniphatak/terraform-jenkins.git']]])     
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: 'https://github.com/mohiniphatak/terraform-jenkins']]])     
             }
         }
   
@@ -67,4 +44,4 @@ pipeline {
         }
       }
     }
-    }
+}
